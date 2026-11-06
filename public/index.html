@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>MIDI Stüdyosu</title>
+  <link rel="stylesheet" href="/css/style.css?v=keyboard-focus-1">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>MIDI STÜDYOSU</h1>
+      <small>Dokunmatik MIDI Denetleyicisi · Sürüm 0.1</small>
+    </div>
+    <div id="connection" class="offline">● Bağlanıyor</div>
+  </header>
+  <main>
+    <section class="panel">
+      <div class="toolbar">
+        <div>
+          <small>ENSTRÜMAN</small>
+          <strong id="instrumentName">PİYANO</strong>
+        </div>
+        <div class="instrument-controls">
+          <button id="localAudioToggle" class="audio-toggle" type="button">Cihaz sesi: Kapalı</button>
+          <label class="channel-picker">KANAL
+            <select id="channelSelect"></select>
+          </label>
+          <div id="octaveControls" class="octave">
+            <button id="octDown" type="button">−</button>
+            <span id="octaveLabel">OKTAV 4</span>
+            <button id="octUp" type="button">+</button>
+          </div>
+        </div>
+      </div>
+      <nav class="view-tabs" aria-label="Instrument view">
+        <button type="button" class="mode-tab active" data-view="piano">Piyano</button>
+        <button type="button" class="mode-tab" data-view="pads">Ritim Pedleri</button>
+        <button type="button" class="mode-tab" data-view="mixer">MIDI Mikseri</button>
+      </nav>
+      <div id="pianoPanel" class="view-panel active">
+        <div class="settings-row">
+          <div class="range-setting">
+            <label for="localVolume">CİHAZ SESİ <span id="localVolumeValue">100%</span></label>
+            <input id="localVolume" type="range" min="0" max="100" value="100">
+          </div>
+          <div class="range-setting">
+            <label for="velocityControl">TUŞ ŞİDDETİ <span id="velocityValue">100</span></label>
+            <input id="velocityControl" type="range" min="1" max="127" value="100">
+          </div>
+        </div>
+        <div id="keyboard" class="keyboard">
+          <div id="whiteKeys" class="white-keys"></div>
+          <div id="blackKeys" class="black-keys"></div>
+        </div>
+        <div class="footer">
+          <span id="pianoNoteInfo">12 NOTA</span>
+          <span id="pianoVelocityInfo">TUŞ ŞİDDETİ: 100</span>
+          <span id="pianoChannelInfo">KANAL: 1</span>
+        </div>
+      </div>
+      <div id="padsPanel" class="view-panel">
+        <div class="section-caption">16 PED · MIDI KANALI 10</div>
+        <div id="padGrid" class="pad-grid"></div>
+        <div class="footer"><span>GM DAVUL KİTİ</span><span>ÇALMAK İÇİN DOKUN</span><span>KANAL: 10</span></div>
+      </div>
+      <div id="mixerPanel" class="view-panel">
+        <div class="section-caption">MIDI DENETİMLERİ · SEÇİLİ KANAL</div>
+        <div id="mixerGrid" class="mixer-grid"></div>
+        <div class="footer"><span>4 DENETİM</span><span>CC 1, 7, 10, 11</span><span id="mixerChannelInfo">KANAL: 1</span></div>
+      </div>
+    </section>
+    <section class="panel info">
+      <span class="led" id="bridgeLed"></span>
+      <span id="bridgeText">Mac MIDI Köprüsü bekleniyor</span>
+    </section>
+  </main>
+  <script src="/js/piano.js?v=keyboard-focus-1"></script>
+</body>
+</html>

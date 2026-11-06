@@ -1,0 +1,14 @@
+{
+  "name": "midi-studio-mac-koprusu",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MIDI Stüdyosu için macOS IAC MIDI köprüsü",
+  "main": "bridge.js",
+  "scripts": {
+    "start": "node bridge.js"
+  },
+  "dependencies": {
+    "jzz": "^1.9.6",
+    "ws": "^8.22.1"
+  }
+}
