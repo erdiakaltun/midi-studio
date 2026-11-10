@@ -10,7 +10,13 @@ const clients = new Set();
 const activeNotes = new Map();
 
 const server = http.createServer((req, res) => {
-  const pathname = decodeURIComponent(req.url.split('?')[0]);
+  let pathname;
+  try {
+    pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+  } catch {
+    res.writeHead(400);
+    return res.end('Bad request');
+  }
   const requested = pathname === '/' ? '/index.html' : pathname;
   const file = path.resolve(ROOT, '.' + requested);
 
@@ -40,7 +46,7 @@ const server = http.createServer((req, res) => {
   });
 });
 
-const wss = new WebSocket.Server({ server, path: '/ws' });
+const wss = new WebSocket.Server({ server, path: '/ws', maxPayload: 1024 });
 
 function send(ws, data) {
   if (ws.readyState === WebSocket.OPEN) {
@@ -89,21 +95,26 @@ wss.on('connection', ws => {
 
     if (msg.type === 'note_on' || msg.type === 'note_off') {
       const note = Number(msg.note);
-      const velocity = Math.max(0, Math.min(127, Number(msg.velocity || 100)));
-    const channel = msg.channel === undefined ? 0 : Number(msg.channel);
+      const defaultVelocity = msg.type === 'note_off' ? 0 : 100;
+      const velocity = msg.velocity === undefined ? defaultVelocity : Number(msg.velocity);
+      const channel = msg.channel === undefined ? 0 : Number(msg.channel);
 
-    if (!Number.isInteger(note) || note < 0 || note > 127 || !Number.isInteger(channel) || channel < 0 || channel > 15) return;
+      if (
+        !Number.isInteger(note) || note < 0 || note > 127 ||
+        !Number.isInteger(velocity) || velocity < 0 || velocity > 127 ||
+        !Number.isInteger(channel) || channel < 0 || channel > 15
+      ) return;
 
       const event = {
         type: msg.type,
         note,
         velocity,
-      channel
+        channel
       };
 
       const key = client.id + ':' + channel + ':' + note;
 
-    if (msg.type === 'note_on') activeNotes.set(key, { client, note, channel });
+      if (msg.type === 'note_on') activeNotes.set(key, { client, note, channel });
       else activeNotes.delete(key);
 
       forwardToBridges(event);
@@ -113,9 +124,13 @@ wss.on('connection', ws => {
     if (msg.type === 'control_change') {
       const cc = Number(msg.controller);
       const value = Number(msg.value);
-    const channel = msg.channel === undefined ? 0 : Number(msg.channel);
+      const channel = msg.channel === undefined ? 0 : Number(msg.channel);
 
-    if (cc >= 0 && cc <= 127 && value >= 0 && value <= 127 && Number.isInteger(channel) && channel >= 0 && channel <= 15) {
+      if (
+        Number.isInteger(cc) && cc >= 0 && cc <= 127 &&
+        Number.isInteger(value) && value >= 0 && value <= 127 &&
+        Number.isInteger(channel) && channel >= 0 && channel <= 15
+      ) {
         forwardToBridges({
           type: 'control_change',
           controller: cc,
