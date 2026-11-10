@@ -84,6 +84,8 @@ wss.on('connection', ws => {
       return;
     }
 
+    if (!msg || typeof msg !== 'object' || Array.isArray(msg)) return;
+
     if (msg.type === 'hello') {
       client.role = msg.role === 'bridge' ? 'bridge' : 'controller';
       send(ws, { type: 'hello', ok: true, role: client.role });
